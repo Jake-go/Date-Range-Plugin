@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<!-- Taken and modified from: https://www.itsolutionstuff.com/post/bootstrap-daterangepicker-example-code-with-demo-using-daterangepickerjsexample.html -->
+<html lang="en">
+
+<head>
+  <script type="text/javascript" src="//cdn.jsdelivr.net/jquery/1/jquery.min.js"></script>
+  <script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap/latest/css/bootstrap.css" />
+  <script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+  <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+</head>
+
+<body>
+
+  <form onsubmit="submitDaterange()">
+    <input type="text" class="daterange" />
+    <input type="submit" value="Submit" class="btn btn-warning btn-sm hover" />
+  </form>
+  <script type="text/javascript">
+    $('.daterange').daterangepicker({
+      linkedCalendars: false,
+      showDropdowns: true,
+      showWeekNumbers: true
+    });
+
+
+    function submitDaterange() {
+      var dateRange = $('.daterange').val();
+      console.log(dateRange);
+      var dates = dateRange.split(" - ");
+      var start = new Date(dates[0]);
+      var end = new Date(dates[1]);
+      if (start > end) {
+        alert("Invalid date range, please try again.");
+        return;
+      }
+      var startDate = (start.getMonth() + 1) + '/' + start.getDate() + '/' + start.getFullYear();
+      var endDate = (end.getMonth() + 1) + '/' + end.getDate() + '/' + end.getFullYear();
+      var dateArray = [startDate, endDate];
+      google.script.run.generateReportsInRange(dateArray);
+      google.script.host.close();
+    }
+  </script>
+</body>
+
+</html>
