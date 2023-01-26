@@ -85,17 +85,16 @@ None
 
 <h3>Pseudocode</h3>
 
-<ol>
-<li>Declare a variable ui and set it equal to the UI of the form using FormApp.getUi().</li>
-<li>Create a menu in the UI named 'Export Responses' using ui.createMenu()</li>
-<li>Add an option to the menu named 'Select Destination Folder' that, when clicked, runs the showPicker() function</li>
-<li>Add an option to the menu named 'Generate Report' that, when clicked, runs the showDatePicker() function</li>
-<li>Add the menu to the UI using addToUi()</li>
-</ol>
+
+1. Declare a variable `ui` and set it equal to the UI of the form using `FormApp.getUi()`.
+2. Create a menu in the UI named 'Export Responses' using `ui.createMenu()`
+3. Add an option to the menu named 'Select Destination Folder' that, when clicked, runs the `showPicker()` function
+4. Add an option to the menu named 'Generate Report' that, when clicked, runs the `showDatePicker()` function
+5. Add the menu to the UI using `addToUi()`
 
 <h3>Note</h3>
 
-onOpen() only needs to be run once to install the menus.
+`onOpen()` only needs to be run once to install the menus.
 
 <h2>generateReportsInRange(dateRange)</h2>
 
@@ -105,10 +104,165 @@ This function generates a Google Doc report of all the responses within the spec
 
 <h3>Inputs</h3>
 
-<ul> <li>dateRange (Array of strings): An array of two strings representing the start and end date of the date range for which responses will be included in the report, according to submission date. The date format should be in "MM/dd/yyyy"
-</li>
-</ul>
+- `dateRange` (Array of strings): An array of two strings representing the start and end date of the date range for which responses will be included in the report, according to submission date. The date format should be in "MM/dd/yyyy"
 
 <h3>Outputs</h3>
 
 <ul><li>A Google Doc containing a report of all the responses within the specified date range. The report includes each question and answer, as well as a 'missing items' row for any unchecked items.</li></ul>
+
+<h3>Example</h3>
+
+```generateReportsInRange(["01/01/2022", "01/15/2022])```
+ 
+This function call will generate a report of all responses from January 1st, 2022 to January 15th, 2022 and store it in a folder specified by the user.
+
+<h3>Pseudocode</h3>
+
+1. Declare a variable form and set it equal to the active form using `FormApp.getActiveForm()`.
+2. Declare a variable dateRanges and set it equal to an empty array.
+3. Parse the start and end date of the date range from string to JavaScript date object and add them to the `dateRanges` array.
+4. Create a Google Doc, name it Site Inspection Summaries for plus the start date in the format of "MM/dd/yyyy" plus " to " plus end date in the format of "MM/dd/yyyy"
+5. Adjust the end date's time to ensure it captures any responses on that day by using `setHours(),setMinutes(),setSeconds()`
+6. Move the newly created Google Doc to the specified folder using `DriveApp.getFileById()` and `DriveApp.getFolderById()`
+7. Declare a variable allResponses and set it equal to all the responses of the form using `form.getResponses()`
+8. Declare a variable `responsesInRange` and set it equal to an empty array.
+9. Using a for loop, iterate through all the responses and check if the timestamp of the response is greater than or equal to the start date and less than or equal to the end date. If the condition is true, push the response to the `responsesInRange` array.
+10. Declare some styling options for the document and a variable responsesDocBody to store the body of the newly created Google Doc
+11. Using a for loop, iterate through the responses in range and declare a variable missingItems and set it equal to an empty array
+12. Declare a variable `responsesItems` to store the `responsesInRange[i].getItemResponses()`
+13. Write the answers and questions to the document using the `responsesDocBody.appendParagraph()` and `responsesDocBody.appendListItem()`
+14. Return the newly created Google Doc
+
+<h2>showDatePicker()</h2>
+
+**Description**
+This function displays an HTML-service dialog in the Form that allows the user to specify the date range for the report.
+
+**Inputs**
+- None
+
+**Outputs**
+- An HTML-service dialog that allows the user to specify the date range for the report.
+
+**Pseudocode**
+1. Declare a variable `html` and set it equal to the output of `HtmlService.createHtmlOutputFromFile('DatePrompt.html')`
+2. Set the width of the HTML-service dialog to 700 pixels using `.setWidth(700)`
+3. Set the height of the HTML-service dialog to 350 pixels using `.setHeight(350)`
+4. Set the sandbox mode of the HTML-service dialog to IFRAME using `.setSandboxMode(HtmlService.SandboxMode.IFRAME)`
+5. Show the HTML-service dialog as a modal using `FormApp.getUi().showModalDialog(html, 'Select Dates')`
+
+**Note:** It is important to note that the `DatePrompt.html` file should exist in the same project and should contain the HTML and JavaScript code that allows the user to specify the date range for the report.
+
+<h2>showPicker()</h2>
+
+<h3>Description</h3>
+
+This function displays an HTML-service dialog in the Form that contains client-side JavaScript code for the Google Picker API. It allows the user to select a folder as the destination where the report will be stored.
+
+<h3>Inputs</h3>
+
+None
+
+<h3>Outputs</h3>
+
+<ul><li>An HTML-service dialog that contains client-side JavaScript code for the Google Picker API.</li></ul>
+
+<h3>Example</h3>
+
+```showPicker()```
+
+<h3>Pseudocode</h3>
+
+1. Declare a variable `html` and set it equal to the output of `HtmlService.createHtmlOutputFromFile('Picker.html')`
+2. Set the width of the HTML-service dialog to 600 pixels using `.setWidth(600)`
+3. Set the height of the HTML-service dialog to 475 pixels using `.setHeight(475)`
+4. Set the sandbox mode of the HTML-service dialog to IFRAME using `.setSandboxMode(HtmlService.SandboxMode.IFRAME)`
+5. Show the HTML-service dialog as a modal using `FormApp.getUi().showModalDialog(html, 'Select Folder')`
+
+It is important to note that the `Picker.html` file should exist in the same project and should contain the client-side JavaScript code for the Google Picker API that is responsible for allowing the user to select a folder.
+
+<h2>getOAuthToken()</h2>
+
+<h3>Description</h3>
+
+This function is used to get the OAuth token required to interact with Google Drive.
+
+<h3>Inputs</h3>
+
+None
+
+<h3>Outputs</h3>
+
+The OAuth Token
+
+<h3>Pseudocode</h3>
+
+1. Call `DriveApp.getRootFolder()`
+2. Return the OAuth token using `ScriptApp.getOAuthToken()`
+
+<h2>seSelectedFolder(id)</h2>
+
+<h3>Description</h3>
+
+This function is used to store the ID of the selected Google Drive folder in script properties.
+
+**Inputs**
+- id: ID of the selected Google Drive folder
+
+**Outputs**
+- None
+
+**Pseudocode**
+1. Set the selected folder's ID in script properties using `PropertiesService.getScriptProperties().setProperty('folderID', id.toString());`
+
+**Note:** This function is used on the Google Script side to interact with the HTML file and pass the required information between them.
+
+<h1>HTML Files</h1>
+
+<h2>DatePrompt.html</h2>
+
+**Description**
+This file is an HTML-service dialog that is displayed by the `showDatePicker()` function in the Google Script. It allows the user to specify the date range for the report by using the Bootstrap-daterangepicker library.
+
+**Inputs**
+- None
+
+**Outputs**
+- An HTML-service dialog that allows the user to specify the date range for the report.
+
+**Pseudocode**
+1. Include jQuery, moment.js, Bootstrap CSS, and Bootstrap-daterangepicker library using the CDN links.
+2. Create a form with an input field of type text with class `daterange` and a submit button.
+3. When the page loads, use jQuery to apply the Bootstrap-daterangepicker library to the input field with class `daterange`.
+4. Define a JavaScript function `submitDaterange()` that is called when the form is submitted.
+5. Inside the `submitDaterange()` function, use jQuery to get the selected date range from the input field with class `daterange`.
+6. Split the selected date range into an array of two dates and convert them into JavaScript `Date` objects.
+7. Check if the start date is greater than the end date. If it is, display an alert message saying "Invalid date range, please try again." and return from the function.
+8. Format the start and end date in the format of `MM/dd/yyyy`.
+
+Create an array with the two formatted dates and pass it to the `generateReportsInRange()` function in the Google Script using `google.script.run.generateReportsInRange(dateArray)`
+
+<h2>Picker.html</h2>
+
+**Description**
+The `Picker.html` file is used to display a dialog box that allows the user to select a Google Drive folder.
+
+**Inputs**
+- None
+
+**Outputs**
+- The ID of the selected Google Drive folder.
+
+**Pseudocode**
+1. Load the Google Picker API using `gapi.load('picker', {callback: function () {pickerApiLoaded = true;}});`
+2. Get an OAuth token using `google.script.run.withSuccessHandler(createPicker).withFailureHandler(showError).getOAuthToken();`
+3. Create a new Google Picker object that allows the user to select Google Drive Folders and sets the callback function to `pickerCallback`
+4. Set the visibility of the picker to true.
+5. When the user selects a folder, the `pickerCallback` function is called, it gets the folder's ID and pass it to the `setSelectedFolder` function in the Google Script and close the dialog box.
+6. If the user cancels the operation, the dialog box is closed.
+
+**Note:** The functions that are used to interact with the Google Script are:
+- `google.script.run.withSuccessHandler(createPicker).withFailureHandler(showError).getOAuthToken();`
+- `google.script.run.setSelectedFolder(id);`
+- `google.script.host.close();`
+
